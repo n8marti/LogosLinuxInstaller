@@ -117,15 +117,15 @@ def run_logos():
     run_wine_proc(config.WINESERVER_EXE, flags=["-w"])
 
 def run_indexing():
-    for root, dirs, files in os.walk(os.path.join(wineprefix, "drive_c")):
+    for root, dirs, files in os.walk(os.path.join(config.WINEPREFIX, "drive_c")):
         for f in files:
             if f == "LogosIndexer.exe" and root.endswith("Logos/System"):
                 logos_indexer_exe = os.path.join(root, f)
                 break
 
-    run_wine_proc(WINESERVER_EXE, flags=["-k"])
-    run_wine_proc(WINE_EXE, exe=logos_indexer_exe)
-    run_wine_proc(WINESERVER_EXE, flags=["-w"])
+    run_wine_proc(config.WINESERVER_EXE, flags=["-k"])
+    run_wine_proc(config.WINE_EXE, exe=logos_indexer_exe)
+    run_wine_proc(config.WINESERVER_EXE, flags=["-w"])
 
 def remove_library_catalog():
     LOGOS_DIR = os.path.dirname(config.LOGOS_EXE)
