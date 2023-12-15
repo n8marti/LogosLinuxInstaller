@@ -174,7 +174,7 @@ def run_wine_proc(winecmd, exe=None, flags=None):
         process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, text=True)
 
         if process.returncode != 0:
-            logging.error(f"Error 1 running {winecmd} {exe}: {return_code}")
+            logging.error(f"Error 1 running {winecmd} {exe}: {process.returncode}")
 
     except subprocess.CalledProcessError as e:
         logging.error(f"Error 2 running {winecmd} {exe}: {e}")
