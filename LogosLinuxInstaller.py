@@ -171,6 +171,9 @@ def restore():
     pass
 
 def main():
+    die_if_running()
+    die_if_root()
+
     # Set initial config; incl. defining CONFIG_FILE.
     set_default_config()
     # Update config from CONFIG_FILE.
@@ -179,6 +182,7 @@ def main():
     if file_exists(config.CONFIG_FILE):
         config.get_config_env(config.CONFIG_FILE)
 
+    parse_command_line()
     # Check for environment variables.
     if config.DIALOG is None:
         getDialog()
@@ -190,10 +194,6 @@ def main():
 
     die_if_running()
     die_if_root()
-
-    parse_command_line()
-    if config.VERBOSE:
-        print(f"{config.DIALOG=}")
 
     cli_msg(f"{config.LOGOS_SCRIPT_TITLE}, {config.LOGOS_SCRIPT_VERSION} by {config.LOGOS_SCRIPT_AUTHOR}.")
 

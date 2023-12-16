@@ -114,7 +114,7 @@ def write_config(config_file_path, config_keys=None):
         print(f"Error writing to config file {config_file_path}: {e}")
 
 def die_if_running():
-    PIDF = '/tmp/LogosLinuxInstaller.pid'
+    PIDF = '/tmp/LogosLinuxInstaller.pid' # FIXME: it's not clear when or how this would get created
     
     if os.path.isfile(PIDF):
         with open(PIDF, 'r') as f:
