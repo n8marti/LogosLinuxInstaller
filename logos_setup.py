@@ -286,7 +286,8 @@ def setWinetricks():
     logging.debug(f"Starting setWinetricks()")
     # Check if local winetricks version available; else, download it
     if config.WINETRICKSBIN is None:
-        if subprocess.run(["which", "winetricks"]).returncode == 0:
+        local_winetricks_path = shutil.which('winetricks')
+        if local_winetricks_path is not None:
             # Check if local winetricks version is up-to-date; if so, offer to use it or to download; else, download it
             local_winetricks_version = subprocess.check_output(["winetricks", "--version"]).split()[0]
             if str(local_winetricks_version) >= "20220411":
@@ -309,7 +310,7 @@ def setWinetricks():
                 logging.info(f"winetricks_choice: {winetricks_choice}")
                 if winetricks_choice.startswith("1"):
                     logging.info("Setting winetricks to the local binary…")
-                    config.WINETRICKSBIN = subprocess.check_output(["which", "winetricks"]).decode('utf-8').strip()
+                    config.WINETRICKSBIN = local_winetricks_path
                 elif winetricks_choice.startswith("2"):
                     downloadWinetricks()
                     config.WINETRICKSBIN = os.path.join(config.APPDIR_BINDIR, "winetricks")
@@ -329,9 +330,9 @@ def setWinetricks():
 def getPremadeWineBottle():
     logging.info("Installing pre-made wineBottle 64bits…")
     logos_reuse_download(config.WINE64_BOTTLE_TARGZ_URL, config.WINE64_BOTTLE_TARGZ_NAME, config.WORKDIR)
-    subprocess.call(["tar", "xzf", os.path.join(config.WORKDIR, config.WINE64_BOTTLE_TARGZ_NAME), "-C", config.APPDIR])
-    # logos_progress("Extracting…", "Extracting: " + config.WINE64_BOTTLE_TARGZ_NAME + "\ninto: " + config.APPDIR)
     logging.info(f"Extracting '{config.WINE64_BOTTLE_TARGZ_NAME}' into '{config.APPDIR}'")
+    shutil.unpack_archive(os.path.join(config.WORKDIR, config.WINE64_BOTTLE_TARGZ_NAME), config.APPDIR)
+    # logos_progress("Extracting…", "Extracting: " + config.WINE64_BOTTLE_TARGZ_NAME + "\ninto: " + config.APPDIR)
 
 
 ## END WINE BOTTLE AND WINETRICKS FUNCTIONS
