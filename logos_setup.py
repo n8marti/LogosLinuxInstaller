@@ -221,7 +221,7 @@ def checkExistingInstall():
     # Now that we know what the user wants to install and where, determine whether an install exists and whether to continue.
     if os.path.isdir(config.INSTALLDIR):
         logging.debug(f"INSTALLDIR: {config.INSTALLDIR}")
-        drive_c = f"{config.INSTALLDIR}/data/wine64_bottle/drive_c" # FIXME: Is WINEPREFIX already known here?
+        drive_c = f"{config.WINEPREFIX}/drive_c"
         names = ['Logos.exe', 'Verbum.exe']
         if os.path.isdir(drive_c) and any(glob.glob(f"{drive_c}/**/{n}", recursive=True) for n in names):
             global EXISTING_LOGOS_INSTALL
