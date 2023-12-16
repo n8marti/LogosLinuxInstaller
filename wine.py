@@ -48,10 +48,9 @@ def wait_on(command):
         # Start the process in the background
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-        sys.stdout.write(f"Waiting on '{' '.join(command)}' to finish.")
         while process.poll() is None:
             logos_progress("Waiting.", f"Waiting on {command} to finish.")
-        print() # FIXME: a workaround until spinner output is fixed
+            time.sleep(0.5)
 
         # Process has finished, check the result
         stdout, stderr = process.communicate()
