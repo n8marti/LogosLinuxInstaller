@@ -146,7 +146,7 @@ def remove_all_index_files():
                 logging.error(f"Error removing {file_to_remove}: {e}")
 
     cli_msg("======= Removing all LogosBible index files done! =======")
-    exit(0)
+    sys.exit(0)
 
 def edit_config():
     pass

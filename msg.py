@@ -76,7 +76,7 @@ def logos_error(message, secondary=None):
     if secondary is None or secondary == "":
         os.remove("/tmp/LogosLinuxInstaller.pid")
         os.kill(os.getpgid(os.getpid()), signal.SIGKILL)
-    exit(1)
+    sys.exit(1)
 
 def cli_question(QUESTION_TEXT):
     while True:

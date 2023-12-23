@@ -161,7 +161,6 @@ def tl(library):
 def getDialog():
     if not os.environ.get('DISPLAY'):
         logos_error("The installer does not work unless you are running a display")
-        sys.exit(1)
 
     DIALOG = os.getenv('DIALOG')
     config.GUI = False

@@ -135,7 +135,7 @@ def chooseVersion():
         checkDependenciesLogos9()
         config.TARGETVERSION = "9"
     elif versionChoice == "Exit.":
-        exit()
+        sys.exit(0)
     else:
         logos_error("Unknown version. Installation canceled!", "")
 
@@ -229,7 +229,7 @@ def beginInstall(app):
     if config.SKEL == True:
         logging.info("Making a skeleton install of the project only. Exiting after completion.")
         make_skel("none.AppImage")
-        exit(0)
+        sys.exit(0)
 
     if config.WINEBIN_CODE:
         if config.WINEBIN_CODE.startswith("AppImage"):
@@ -292,7 +292,8 @@ def setWinetricks():
                     downloadWinetricks()
                     config.WINETRICKSBIN = os.path.join(config.APPDIR_BINDIR, "winetricks")
                 else:
-                    sys.exit("Installation canceled!")
+                    cli_msg("Installation canceled!")
+                    sys.exit(0)
             else:
                 cli_msg("The system's winetricks is too old. Downloading an up-to-date winetricks from the Internet...")
                 downloadWinetricks()
