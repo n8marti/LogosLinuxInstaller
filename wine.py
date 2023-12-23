@@ -91,7 +91,7 @@ def createWineBinaryList():
             continue
         else:
             binaries.remove(binary)
-            print(f"Removing binary:", binary, "because:", output2)
+            logging.info(f"Removing binary: {binary} because: {output2}")
     
     return binaries
 
