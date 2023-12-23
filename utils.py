@@ -241,7 +241,7 @@ def get_package_manager():
         config.PACKAGES = "binutils cabextract fuse wget winbind"
     elif shutil.which('dnf') is not None:
         config.PACKAGE_MANAGER_COMMAND = "dnf install -y"
-        config.PACKAGES = "patch mod_auth_ntlm_winbind samba-winbind cabextract bc libxml2 curl"
+        config.PACKAGES = "patch mod_auth_ntlm_winbind samba-winbind samba-winbind-clients cabextract bc libxml2 curl"
     elif shutil.which('yum') is not None:
         config.PACKAGE_MANAGER_COMMAND = "yum install -y"
         config.PACKAGES = "patch mod_auth_ntlm_winbind samba-winbind cabextract bc libxml2 curl"
