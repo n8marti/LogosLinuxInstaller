@@ -30,7 +30,7 @@ def get_pids_using_file(file_path, mode=None):
     return pids
 
 def wait_process_using_dir(directory):
-    logging.info(f"* Starting wait_process_using_dir for {VERIFICATION_DIR}…")
+    logging.info(f"* Starting wait_process_using_dir for {directory}…")
 
     # Get pids and wait for them to finish.
     pids = get_pids_using_file(directory)
