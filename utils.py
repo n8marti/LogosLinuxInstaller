@@ -236,19 +236,19 @@ def get_package_manager():
         config.SUPERUSER_COMMAND = "doas"
 
     # Check for package manager and associated packages
-    if shutil.which('apt') is not None:
+    if shutil.which('apt') is not None: # debian, ubuntu
         config.PACKAGE_MANAGER_COMMAND = "apt install -y"
         config.PACKAGES = "binutils cabextract fuse wget winbind"
-    elif shutil.which('dnf') is not None:
+    elif shutil.which('dnf') is not None: # rhel, fedora
         config.PACKAGE_MANAGER_COMMAND = "dnf install -y"
         config.PACKAGES = "patch mod_auth_ntlm_winbind samba-winbind samba-winbind-clients cabextract bc libxml2 curl"
-    elif shutil.which('yum') is not None:
+    elif shutil.which('yum') is not None: # rhel, fedora
         config.PACKAGE_MANAGER_COMMAND = "yum install -y"
         config.PACKAGES = "patch mod_auth_ntlm_winbind samba-winbind cabextract bc libxml2 curl"
-    elif shutil.which('pamac') is not None:
+    elif shutil.which('pamac') is not None: # manjaro
         config.PACKAGE_MANAGER_COMMAND = "pamac install --no-upgrade --no-confirm"
         config.PACKAGES = "patch wget sed grep gawk cabextract samba bc libxml2 curl"
-    elif shutil.which('pacman') is not None:
+    elif shutil.which('pacman') is not None: # arch
         config.PACKAGE_MANAGER_COMMAND = 'pacman -Syu --overwrite \* --noconfirm --needed'
         config.PACKAGES = "patch wget sed grep gawk cabextract samba bc libxml2 curl print-manager system-config-printer cups-filters nss-mdns foomatic-db-engine foomatic-db-ppds foomatic-db-nonfree-ppds ghostscript glibc samba extra-rel/apparmor core-rel/libcurl-gnutls winetricks cabextract appmenu-gtk-module patch bc lib32-libjpeg-turbo qt5-virtualkeyboard wine-staging giflib lib32-giflib libpng lib32-libpng libldap lib32-libldap gnutls lib32-gnutls mpg123 lib32-mpg123 openal lib32-openal v4l-utils lib32-v4l-utils libpulse lib32-libpulse libgpg-error lib32-libgpg-error alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib libjpeg-turbo lib32-libjpeg-turbo sqlite lib32-sqlite libxcomposite lib32-libxcomposite libxinerama lib32-libgcrypt libgcrypt lib32-libxinerama ncurses lib32-ncurses ocl-icd lib32-ocl-icd libxslt lib32-libxslt libva lib32-libva gtk3 lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs vulkan-icd-loader lib32-vulkan-icd-loader"
     # Add more conditions for other package managers as needed
