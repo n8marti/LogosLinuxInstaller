@@ -170,8 +170,6 @@ def main():
         config.set_config_env(config.CONFIG_FILE)
 
     parse_command_line()
-    if config.VERBOSE:
-        print(f"{config.DIALOG=}")
 
     # If Logos app is installed, run the desired Logos action.
     if config.LOGOS_EXE is not None and os.access(config.LOGOS_EXE, os.X_OK):

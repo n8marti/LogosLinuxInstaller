@@ -620,18 +620,15 @@ def get_pids_using_file(file_path, mode=None):
     return pids
 
 def wait_process_using_dir(directory):
-    if config.VERBOSE:
-        print(f"* Starting wait_process_using_dir for {directory}…")
+    logging.info(f"* Starting wait_process_using_dir for {directory}…")
 
     # Get pids and wait for them to finish.
     pids = get_pids_using_file(directory)
     for pid in pids:    
-        if config.VERBOSE:
-            print(f"wait_process_using_dir PID: {pid}")
+        logging.info(f"wait_process_using_dir PID: {pid}")
         psutil.wait(pid)
 
-    if config.VERBOSE:
-        print("* End of wait_process_using_dir.")
+    logging.info("* End of wait_process_using_dir.")
 
 def wget(uri, target, q=None, app=None, evt=None):
     cmd = ['wget', '-q', '--show-progress', '--progress=dot', '-c', uri, '-O', target]
