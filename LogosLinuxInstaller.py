@@ -105,9 +105,9 @@ def parse_command_line():
         if os.path.isdir(args.custom_binary_path):
             config.CUSTOMBINPATH = args.custom_binary_path
         else:
-            sys.stderr.write(f"{config.LOGOS_SCRIPT_TITLE}: User supplied path: \"{args.custom_binary_path}\". Custom binary path does not exist.\n")
+            cli_msg(f"{config.LOGOS_SCRIPT_TITLE}: User supplied path: \"{args.custom_binary_path}\". Custom binary path does not exist.")
             parser.print_help()
-            sys.exit()
+            sys.exit(1)
 
     if args.indexing:
         config.ACTION = 'indexing'
@@ -190,7 +190,6 @@ def main():
             config.GUI = True
         
     if config.GUI is True:
-        logos_info("Running in a GUI.")
         setDebug()
 
     cli_msg(f"{config.LOGOS_SCRIPT_TITLE}, {config.LOGOS_SCRIPT_VERSION} by {config.LOGOS_SCRIPT_AUTHOR}.")
@@ -198,7 +197,7 @@ def main():
     # Configure logging.
     if config.DELETE_INSTALL_LOG and os.path.isfile(config.LOGOS_LOG):
         os.remove(config.LOGOS_LOG)
-    initialize_logging(config.LOG_LEVEL)   
+    initialize_logging(config.LOG_LEVEL)
     logging.info("Starting installation.") 
     logging.info(f"Using DIALOG: {config.DIALOG}")
 

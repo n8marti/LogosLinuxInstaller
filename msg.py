@@ -70,8 +70,8 @@ def logos_error(message, secondary=None):
     TELEGRAM_LINK = "https://t.me/linux_logos"
     MATRIX_LINK = "https://matrix.to/#/#logosbible:matrix.org"
     help_message = f"If you need help, please consult:\n{WIKI_LINK}\n{TELEGRAM_LINK}\n{MATRIX_LINK}"
-    if config.DIALOG == 'curses':
-        logging.critical(f"{message}\n{help_message}")
+    logging.critical(message)
+    cli_msg(help_message)
 
     if secondary is None or secondary == "":
         os.remove("/tmp/LogosLinuxInstaller.pid")
@@ -89,7 +89,7 @@ def cli_question(QUESTION_TEXT):
         elif yn.lower() == 'n':
             return False
         else:
-            print("Type Y[es] or N[o].")
+            cli_msg("Type Y[es] or N[o].")
             
 def cli_continue_question(QUESTION_TEXT, NO_TEXT, SECONDARY):
     if not cli_question(QUESTION_TEXT):

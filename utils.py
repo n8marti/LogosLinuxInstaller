@@ -113,7 +113,7 @@ def write_config(config_file_path, config_keys=None):
             config_file.write('\n')
 
     except IOError as e:
-        print(f"Error writing to config file {config_file_path}: {e}")
+        logos_error(f"Error writing to config file {config_file_path}: {e}")
 
 def die_if_running():
     PIDF = '/tmp/LogosLinuxInstaller.pid' # FIXME: it's not clear when or how this would get created
@@ -144,7 +144,6 @@ def setDebug():
     config.DEBUG = True
     config.VERBOSE = True
     config.WINEDEBUG = ""
-    logging.info("Debug mode enabled.")
 
 def t(command):
     if shutil.which(command) is not None:
