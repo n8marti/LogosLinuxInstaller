@@ -158,6 +158,16 @@ def logos_setup():
         config.APPDIR = f"{config.INSTALLDIR}/data"
     if config.APPDIR_BINDIR is None or config.APPDIR_BINDIR == "":
         config.APPDIR_BINDIR = f"{config.APPDIR}/bin"
+    variables = {
+        'config.FLPRODUCT': config.FLPRODUCT,
+        'config.FLPRODUCTi': config.FLPRODUCTi,
+        'config.LOGOS_VERSION': config.LOGOS_VERSION,
+        'config.INSTALLDIR': config.INSTALLDIR,
+        'config.APPDIR': config.APPDIR,
+        'config.APPDIR_BINDIR': config.APPDIR_BINDIR,
+    }
+    for k, v in variables.items():
+        logging.debug(f"{k}: {v}")
 
 def chooseInstallMethod():
     if config.WINEPREFIX is None:
@@ -178,6 +188,12 @@ def chooseInstallMethod():
 
         config.WINEBIN_CODE = WINECHOICE_CODE
         logging.info(f"WINEBIN_CODE: {config.WINEBIN_CODE}; WINE_EXE: {config.WINE_EXE}")
+    variables = {
+        'config.WINEPREFIX': config.WINEPREFIX,
+        'config.WINE_EXE': config.WINE_EXE,
+    }
+    for k, v in variables.items():
+        logging.debug(f"{k}: {v}")
 
 def checkExistingInstall(app=None):
     message = "Checking for existing installation..."

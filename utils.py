@@ -544,7 +544,7 @@ def getLogosReleases(q=None, app=None):
     if q is not None and app is not None:
         q.put(releases)
         app.root.event_generate("<<ReleaseCheckProgress>>")
-
+    logging.debug(f"Available releases: {', '.join(releases)}")
     return releases
 
 def getWineBinOptions(binaries):
