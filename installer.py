@@ -414,6 +414,7 @@ def postInstall(app):
         logging.info(message)
 
         if not os.path.isfile(config.CONFIG_FILE): # config.CONFIG_FILE is set in main() function
+            logging.info(f"No config file at {config.CONFIG_FILE}")
             os.makedirs(os.path.join(HOME, ".config", "Logos_on_Linux"), exist_ok=True)
             if os.path.isdir(os.path.join(HOME, ".config", "Logos_on_Linux")):
                 write_config(config.CONFIG_FILE, config_keys)
@@ -421,7 +422,9 @@ def postInstall(app):
             else:
                 logos_warn(f"{HOME}/.config/Logos_on_Linux does not exist. Failed to create config file.")
         elif os.path.isfile(config.CONFIG_FILE):
+            logging.info(f"Config file exists at {config.CONFIG_FILE}.")
             # Compare existing config file contents with installer config.
+            logging.info(f"Comparing its contents with current config.")
             current_config_file_dict = config.get_config_file_dict(config.CONFIG_FILE)
             different = False
             for key in config_keys:
@@ -429,6 +432,7 @@ def postInstall(app):
                     different = True
                     break
             if different is True and logos_acknowledge_question(f"Update config file at {config.CONFIG_FILE}?", "The existing config file was not overwritten."):
+                logging.info(f"Updating config file.")
                 write_config(config.CONFIG_FILE, config_keys)
         else:
             # Script was run with a config file. Skip modifying the config.
@@ -440,7 +444,9 @@ def postInstall(app):
             launcher_exe = Path(f"{config.INSTALLDIR}/LogosLinuxLauncher")
             # FIXME: Confirm file copy and test desktop launcher.
             if launcher_exe.is_file():
+                logging.debug(f"Removing existing launcher binary.")
                 launcher_exe.unlink()
+            logging.info(f"Creating launcher binary by copying this installer binary to {launcher_exe}.")
             shutil.copy(sys.executable, launcher_exe)
             create_shortcut()
 
@@ -526,8 +532,10 @@ def create_shortcut():
 
     desktop_entry_path = os.path.expanduser(f"~/.local/share/applications/{config.FLPRODUCT}Bible.desktop")
     if os.path.exists(desktop_entry_path):
+        logging.info(f"Removing desktop launcher at {desktop_entry_path}.")
         os.remove(desktop_entry_path)
 
+    logging.info(f"Creating desktop launcher at {desktop_entry_path}.")
     with open(desktop_entry_path, 'w') as desktop_file:
         desktop_file.write(f"""[Desktop Entry]
 Name={config.FLPRODUCT}Bible
