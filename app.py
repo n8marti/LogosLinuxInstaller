@@ -393,13 +393,16 @@ class InstallerWindow(Gui):
     def update_release_check_progress(self, evt=None):
         self.progress.stop()
         self.statusvar.set('')
+        self.progress.config(mode='determinate')
+        self.progressvar.set(0)
         r = self.release_q.get()
         if r is not None:
             self.release_dropdown['values'] = r
             self.releasevar.set(self.release_dropdown['values'][0])
             self.set_release()
-            self.progress.config(mode='determinate')
-            self.progressvar.set(0)
+        else:
+            self.statusvar.set("Failed to get release list. Check connection and try again.")
+
 
     def update_file_size_check_progress(self, evt=None):
         e, r = self.check_q.get()
