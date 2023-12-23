@@ -233,21 +233,11 @@ def run_winetricks():
     run_wine_proc(config.WINESERVER_EXE, exe_args=["-w"])
 
 def winetricks_install(*args):
-    logging.info(f"winetricks {' '.join(args)}")
-
-    run_wine_proc(config.WINETRICKSBIN, exe_args=args)
-
-    logging.info(f"winetricks {' '.join(args)} DONE!")
-
-    heavy_wineserver_wait()
-
-def winetricks_dll_install(*args):
-    cli_msg(f"Installing '{args[-1]}' with winetricks.")
-    logging.info(f"winetricks {' '.join(args)}")
-    #logos_continue_question("Now the script will install the DLL " + " ".join(args) + ". This may take a while. There will not be any GUI feedback for this. Continue?", "The installation was cancelled!", "")
-
-    run_wine_proc(config.WINETRICKSBIN, exe_args=args)
-    logging.info(f"winetricks {' '.join(args)} DONE!")
+    cmd = ['-v', *args]
+    cli_msg(f"Running winetricks \"{args[-1]}\"")
+    logging.info(f"running \"winetricks {' '.join(cmd)}\"")
+    run_wine_proc(config.WINETRICKSBIN, exe_args=cmd)
+    logging.info(f"\"winetricks {' '.join(cmd)}\" DONE!")
     heavy_wineserver_wait()
 
 def installFonts():
@@ -263,10 +253,10 @@ def installFonts():
     winetricks_install('-q', 'settings', 'fontsmooth=rgb')
 
 def installD3DCompiler():
+    cmd = ['d3dcompiler_47']
     if config.WINETRICKS_UNATTENDED is None:
-        winetricks_dll_install('-q', 'd3dcompiler_47')
-    else:
-        winetricks_dll_install('d3dcompiler_47')
+        cmd.insert(0, '-q')
+    winetricks_install(*cmd)
 
 def switch_logging(action=None):
     if action == 'disable':
