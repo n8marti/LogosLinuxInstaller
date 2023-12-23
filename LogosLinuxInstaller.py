@@ -9,6 +9,8 @@ import config
 from app import InstallerApp
 from app import InstallerWindow
 from installer import install
+from msg import cli_msg
+from msg import initialize_logging
 from msg import logos_error
 from utils import checkDependencies
 from utils import curses_menu

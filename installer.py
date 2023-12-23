@@ -1,5 +1,6 @@
 import datetime
 import glob
+import logging
 import os
 import shutil
 import subprocess
@@ -9,10 +10,10 @@ import urllib.request
 from pathlib import Path
 
 import config
+from msg import cli_msg
 from msg import logos_acknowledge_question
 from msg import logos_error
 from msg import logos_info
-from msg import logos_progress
 from msg import logos_warn
 from utils import check_libs
 from utils import checkDependencies

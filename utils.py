@@ -21,6 +21,7 @@ from xml.etree import ElementTree as ET
 
 import config
 from msg import cli_continue_question
+from msg import cli_msg
 from msg import logos_error
 from msg import logos_info
 
