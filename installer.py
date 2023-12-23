@@ -517,18 +517,26 @@ def create_shortcut():
         config.LOGOS_ICON_FILENAME = os.path.basename(config.LOGOS_ICON_URL)
 
     logos_icon_path = os.path.join(config.APPDIR, config.LOGOS_ICON_FILENAME)
+    logos_icon_downloaded = os.path.join(config.MYDOWNLOADS, config.LOGOS_ICON_FILENAME)
 
     if not os.path.isfile(logos_icon_path):
         os.makedirs(config.APPDIR, exist_ok=True)
-        raw_bytes = None
-        try:
-            with urllib.request.urlopen(config.LOGOS_ICON_URL) as f:
-                raw_bytes = f.read()
-        except urllib.error.URLError as e:
-            logos_error(e)
-        if raw_bytes is not None:
-            with open(logos_icon_path, 'wb') as f:
-                f.write(raw_bytes)
+        if not os.path.isfile(logos_icon_downloaded):
+            logging.info(f"Downloading icon from {config.LOGOS_ICON_URL}")
+            raw_bytes = None
+            try:
+                with urllib.request.urlopen(config.LOGOS_ICON_URL) as f:
+                    raw_bytes = f.read()
+            except urllib.error.URLError as e:
+                logos_error(e)
+            if raw_bytes is not None:
+                with open(logos_icon_path, 'wb') as f:
+                    f.write(raw_bytes)
+        else:
+            logging.info(f"Using icon file at {logos_icon_downloaded}")
+            shutil.copy(logos_icon_downloaded, logos_icon_path)
+    else:
+        logging.info(f"Icon found at {logos_icon_path}.")
 
     desktop_entry_path = os.path.expanduser(f"~/.local/share/applications/{config.FLPRODUCT}Bible.desktop")
     if os.path.exists(desktop_entry_path):
