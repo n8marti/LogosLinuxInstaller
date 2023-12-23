@@ -193,9 +193,6 @@ def main():
         logos_info("Running in a GUI.")
         setDebug()
 
-    die_if_running()
-    die_if_root()
-
     cli_msg(f"{config.LOGOS_SCRIPT_TITLE}, {config.LOGOS_SCRIPT_VERSION} by {config.LOGOS_SCRIPT_AUTHOR}.")
 
     # Configure logging.
