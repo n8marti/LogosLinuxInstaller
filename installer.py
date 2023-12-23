@@ -13,7 +13,6 @@ import config
 from msg import cli_msg
 from msg import logos_acknowledge_question
 from msg import logos_error
-from msg import logos_info
 from msg import logos_warn
 from utils import check_libs
 from utils import checkDependencies
@@ -58,8 +57,9 @@ def logos_reuse_download(SOURCEURL, FILE, TARGETDIR):
             FOUND = 0
             break
     if FOUND == 1:
-        logos_info(f"{FILE} does not exist. Downloading…")
-        cli_msg(f"Downloading {SOURCEURL} to {config.MYDOWNLOADS}")
+        message = f"{FILE} does not exist. Downloading {SOURCEURL} to {config.MYDOWNLOADS}"
+        logging.info(message)
+        cli_msg(message)
         logos_download(SOURCEURL, os.path.join(config.MYDOWNLOADS, FILE))
         cli_msg(f"Copying: {FILE} into: {TARGETDIR}")
         shutil.copy(os.path.join(config.MYDOWNLOADS, FILE), TARGETDIR)
@@ -174,8 +174,9 @@ def chooseInstallMethod():
         config.WINEPREFIX = os.path.join(config.APPDIR, "wine64_bottle")
 
     if config.WINE_EXE is None:
-        logos_info("Creating binary list.")
+        logging.info("Creating binary list.")
         binaries = createWineBinaryList()
+        logging.debug(f"binaries: {', '.join(binaries)}")
         WINEBIN_OPTIONS = getWineBinOptions(binaries)
 
         BACKTITLE="Choose Wine Binary Menu"
@@ -408,13 +409,15 @@ def postInstall(app):
         logging.debug(f"{k}: {config.__dict__.get(k)}")
 
     if os.path.isfile(config.LOGOS_EXE):
-        logos_info(f"{config.FLPRODUCT} Bible {config.TARGETVERSION} installed!")
+        message = f"{config.FLPRODUCT} Bible {config.TARGETVERSION} installed!"
+        cli_msg(message)
+        logging.info(message)
 
         if not os.path.isfile(config.CONFIG_FILE): # config.CONFIG_FILE is set in main() function
             os.makedirs(os.path.join(HOME, ".config", "Logos_on_Linux"), exist_ok=True)
             if os.path.isdir(os.path.join(HOME, ".config", "Logos_on_Linux")):
                 write_config(config.CONFIG_FILE, config_keys)
-                logos_info(f"A config file was created at {config.CONFIG_FILE}.")
+                logging.info(f"A config file was created at {config.CONFIG_FILE}.")
             else:
                 logos_warn(f"{HOME}/.config/Logos_on_Linux does not exist. Failed to create config file.")
         elif os.path.isfile(config.CONFIG_FILE):

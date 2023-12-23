@@ -46,10 +46,6 @@ def cli_msg(message, end='\n'):
     ''' Used for messages that should be printed to stdout regardless of log level. '''
     print(message, end=end)
 
-def logos_info(message):
-    if config.DIALOG == 'curses':
-        cli_msg(message)
-
 def logos_progress():
     if config.DIALOG == 'curses':
         sys.stdout.write('.')
@@ -97,7 +93,7 @@ def cli_continue_question(QUESTION_TEXT, NO_TEXT, SECONDARY):
         
 def cli_acknowledge_question(QUESTION_TEXT, NO_TEXT):
     if not cli_question(QUESTION_TEXT):
-        logos_info(NO_TEXT)
+        cli_msg(NO_TEXT)
         return False
     else:
         return True

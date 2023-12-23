@@ -35,7 +35,6 @@ from wine import switch_logging
 #TODO: Test get_os and get_package_manager
 #TODO: Verify necessary packages now that we are using python
 #TODO: Redo logos_progress
-#TODO: Fix python print lines to use logos_error
 #TODO: Test optargs and menu options
 
 # AppImage Handling
@@ -47,7 +46,6 @@ from wine import switch_logging
 #TODO: Put main menu into a while loop
 #TODO: Add an option to reinstall dependencies for SteamOS
 #TODO: Add a get_winetricks option to post-install menu
-#TODO: Implement logging via logging module
 
 
 def parse_command_line():
