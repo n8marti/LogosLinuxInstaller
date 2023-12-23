@@ -42,19 +42,18 @@ def initialize_logging(stderr_log_level):
     )
     cli_msg(f"Installer log file: {config.LOGOS_LOG}")
 
-def cli_msg(message):
+def cli_msg(message, end='\n'):
     ''' Used for messages that should be printed to stdout regardless of log level. '''
-    print(message)
+    print(message, end=end)
 
 def logos_info(message):
     if config.DIALOG == 'curses':
         cli_msg(message)
 
-def logos_progress(title, text):
+def logos_progress():
     if config.DIALOG == 'curses':
         sys.stdout.write('.')
         sys.stdout.flush()
-        time.sleep(0.5)
         # i = 0
         # spinner = "|/-\\"
         # sys.stdout.write(f"\r{text} {spinner[i]}")

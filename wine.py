@@ -44,10 +44,11 @@ def wait_on(command):
     try:
         # Start the process in the background
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
+        cli_msg(f"Waiting on \"{' '.join(command)}\" to finish.", end='')
         while process.poll() is None:
-            logos_progress("Waiting.", f"Waiting on {command} to finish.")
+            logos_progress()
             time.sleep(0.5)
+        print()
 
         # Process has finished, check the result
         stdout, stderr = process.communicate()
