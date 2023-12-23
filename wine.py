@@ -197,14 +197,14 @@ def install_msi():
     logging.info(f"Running: {config.WINE_EXE} msiexec {' '.join(exe_args)}")
     run_wine_proc(config.WINE_EXE, exe="msiexec", exe_args=exe_args)
 
-def run_wine_proc(winecmd, exe=None, exe_args=None):
+def run_wine_proc(winecmd, exe=None, exe_args=list()):
     env = get_wine_env()
     logging.debug(f"run_wine_proc: {winecmd} {exe} {' '.join(exe_args)}")
 
     command = [winecmd]
     if exe is not None:
         command.append(exe)
-    if exe_args is not None:
+    if len(exe_args) > 0:
         command.extend(exe_args)
 
     try:
