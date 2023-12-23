@@ -161,6 +161,7 @@ def wineBinaryVersionCheck(TESTBINARY):
     return True, "None"
 
 def initializeWineBottle(app):
+    cli_msg(f"Initializing wine bottle...")
     if app is not None:
         app.install_q.put("Initializing wine bottle...")
         app.root.event_generate("<<UpdateInstallText>>")
@@ -190,15 +191,17 @@ def wine_reg_install(REG_FILE):
     light_wineserver_wait()
 
 def install_msi():
+    cli_msg(f"Running MSI installer for {config.FLPRODUCT}.")
     # Execute the .MSI
     exe_args = ["/i", f"{config.APPDIR}/{config.LOGOS_EXECUTABLE}"]
     if config.PASSIVE is True:
         exe_args.append('/passive')
-    logginginfo(f"Running: {config.WINE_EXE} msiexec {' '.join(exe_args)}")
+    logging.info(f"Running: {config.WINE_EXE} msiexec {' '.join(exe_args)}")
     run_wine_proc(config.WINE_EXE, exe="msiexec", exe_args=exe_args)
 
 def run_wine_proc(winecmd, exe=None, exe_args=None):
     env = get_wine_env()
+    logging.debug(f"run_wine_proc: {winecmd} {exe} {' '.join(exe_args)}")
 
     command = [winecmd]
     if exe is not None:
@@ -211,9 +214,12 @@ def run_wine_proc(winecmd, exe=None, exe_args=None):
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
         with process.stdout:
             for line in iter(process.stdout.readline, b''):
-                print(line.decode().rstrip())
+                if winecmd.endswith('winetricks'):
+                    logging.debug(line.decode().rstrip())
+                else:
+                    logging.info(line.decode().rstrip())
         returncode = process.wait()
-                
+
         if returncode != 0:
             logging.error(f"Error 1 running {winecmd} {exe}: {process.returncode}")
 
@@ -247,6 +253,7 @@ def winetricks_dll_install(*args):
     heavy_wineserver_wait()
 
 def installFonts():
+    cli_msg("Configuring fonts...")
     fonts = ['corefonts', 'tahoma']
     if not config.SKIP_FONTS:
         for f in fonts:

@@ -144,8 +144,7 @@ def setDebug():
     config.DEBUG = True
     config.VERBOSE = True
     config.WINEDEBUG = ""
-    with open(config.LOGOS_LOG, 'a') as f:
-        f.write("Debug mode enabled.\n")
+    logging.info("Debug mode enabled.")
 
 def t(command):
     if shutil.which(command) is not None:
@@ -272,11 +271,11 @@ def have_dep(cmd):
         return False
 
 def clean_all():
-    logos_info("Cleaning all temp files…")
+    logging.info("Cleaning all temp files…")
     os.system("rm -fr /tmp/LBS.*")
     os.system(f"rm -fr {config.WORKDIR}")
     os.system(f"rm -f {config.PRESENT_WORKING_DIRECTORY}/wget-log*")
-    logos_info("done")
+    logging.info("done")
 
 def mkdir_critical(directory):
     try:
@@ -511,6 +510,7 @@ def file_exists(file_path):
         return False
 
 def getLogosReleases(q=None, app=None):
+    cli_msg(f"Downloading release list for {config.FLPRODUCT} {config.TARGETVERSION}...")
     url = f"https://clientservices.logos.com/update/v1/feed/logos{config.TARGETVERSION}/stable.xml"
 
     try:

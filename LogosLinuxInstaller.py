@@ -190,8 +190,7 @@ def main():
             config.GUI = True
         
     if config.GUI is True:
-        with open(config.LOGOS_LOG, "a") as f:
-            f.write("Running in a GUI. Enabling logging.\n")
+        logos_info("Running in a GUI.")
         setDebug()
 
     die_if_running()
@@ -202,6 +201,8 @@ def main():
     # Configure logging.
     if config.DELETE_INSTALL_LOG and os.path.isfile(config.LOGOS_LOG):
         os.remove(config.LOGOS_LOG)
+    initialize_logging(config.LOG_LEVEL)   
+    logging.info("Starting installation.") 
     logging.info(f"Using DIALOG: {config.DIALOG}")
 
     options_default = ["Install Logos Bible Software"]

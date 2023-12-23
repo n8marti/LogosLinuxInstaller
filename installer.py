@@ -52,16 +52,17 @@ def logos_reuse_download(SOURCEURL, FILE, TARGETDIR):
     FOUND = 1
     for i in DIRS:
         if os.path.isfile(os.path.join(i, FILE)):
-            logos_info(f"{FILE} exists in {i}. Using it…")
+            logging.info(f"{FILE} exists in {i}. Using it…")
+            cli_msg(f"Copying {FILE} into {TARGETDIR}")
             shutil.copy(os.path.join(i, FILE), TARGETDIR)
-            logos_progress("Copying…", f"Copying {FILE}\ninto {TARGETDIR}")
             FOUND = 0
             break
     if FOUND == 1:
         logos_info(f"{FILE} does not exist. Downloading…")
+        cli_msg(f"Downloading {SOURCEURL} to {config.MYDOWNLOADS}")
         logos_download(SOURCEURL, os.path.join(config.MYDOWNLOADS, FILE))
+        cli_msg(f"Copying: {FILE} into: {TARGETDIR}")
         shutil.copy(os.path.join(config.MYDOWNLOADS, FILE), TARGETDIR)
-        logos_progress("Copying…", f"Copying: {FILE}\ninto: {TARGETDIR}")
 
 def getAppImage():
     wine64_appimage_full_filename = Path(config.WINE64_APPIMAGE_FULL_FILENAME)
@@ -82,7 +83,7 @@ def chooseProduct():
     else:
         productChoice = config.FLPRODUCT
 
-    print("productChoice:" + str(productChoice))
+    logging.info(f"Product: {str(productChoice)}")
     if str(productChoice).startswith("Logos"):
         logging.info("Installing Logos Bible Software")
         config.FLPRODUCT = "Logos"
@@ -109,6 +110,7 @@ def getLogosReleaseVersion(releases):
     QUESTION_TEXT=f"Which version of {config.FLPRODUCT} {config.TARGETVERSION} do you want to install?"
     logos_release_version = curses_menu(releases, TITLE, QUESTION_TEXT)
 
+    logging.info(f"Release version: {logos_release_version}")
     if logos_release_version is not None:
         config.LOGOS_RELEASE_VERSION = logos_release_version
     else:
@@ -123,7 +125,8 @@ def chooseVersion():
         versionChoice = curses_menu(options, TITLE, QUESTION_TEXT)
     else:
         versionChoice = config.TARGETVERSION
-   
+    logging.info(f"Target version: {config.TARGETVERSION}")
+
     checkDependencies()
     if "10" in versionChoice:
         checkDependenciesLogos10()
@@ -138,7 +141,6 @@ def chooseVersion():
 
 def logos_setup():
     if config.LOGOS64_URL is None or config.LOGOS64_URL == "":
-        print(config.TARGETVERSION, config.VERBUM_PATH, config.LOGOS_RELEASE_VERSION, config.FLPRODUCT)
         config.LOGOS64_URL = f"https://downloads.logoscdn.com/LBS{config.TARGETVERSION}{config.VERBUM_PATH}Installer/{config.LOGOS_RELEASE_VERSION}/{config.FLPRODUCT}-x64.msi"
 
     if config.FLPRODUCT == "Logos":
@@ -178,9 +180,11 @@ def chooseInstallMethod():
         logging.info(f"WINEBIN_CODE: {config.WINEBIN_CODE}; WINE_EXE: {config.WINE_EXE}")
 
 def checkExistingInstall(app=None):
+    message = "Checking for existing installation..."
+    cli_msg(message)
     # Now that we know what the user wants to install and where, determine whether an install exists and whether to continue.
     if app is not None:
-        app.install_q.put("Checking for existing installation...")
+        app.install_q.put(message)
         app.root.event_generate("<<UpdateInstallText>>")
 
     if os.path.isdir(config.INSTALLDIR):
@@ -204,8 +208,10 @@ def checkExistingInstall(app=None):
         app.root.event_generate("<<CheckExistingInstallDone>>")
 
 def beginInstall(app):
+    message = "Preparing installation folder..."
+    cli_msg(message)
     if app is not None:
-        app.install_q.put("Preparing installation folder...")
+        app.install_q.put(message)
         app.root.event_generate("<<UpdateInstallText>>")
 
     if config.SKEL == True:
@@ -247,10 +253,12 @@ def beginInstall(app):
             print(f"{wineserver_path} not found. Please either add it or create a symlink to it, and rerun.")
 
 def downloadWinetricks():
+    cli_msg("Downloading winetricks...")
     logos_reuse_download(config.WINETRICKS_URL, "winetricks", config.APPDIR_BINDIR)
     os.chmod(f"{config.APPDIR_BINDIR}/winetricks", 0o755)
 
 def setWinetricks():
+    cli_msg("Preparing winetricks...")
     # Check if local winetricks version available; else, download it
     if config.WINETRICKSBIN is None:
         local_winetricks_path = shutil.which('winetricks')
@@ -283,14 +291,12 @@ def setWinetricks():
             downloadWinetricks()
             config.WINETRICKSBIN = os.path.join(config.APPDIR_BINDIR, "winetricks")
 
-    print("Winetricks is ready to be used.")
-
 def getPremadeWineBottle():
     cli_msg("Installing pre-made wineBottle 64bits…")
     logging.info(f"Downloading {config.WINE64_BOTTLE_TARGZ_URL} to {config.WORKDIR}")
     logos_reuse_download(config.WINE64_BOTTLE_TARGZ_URL, config.WINE64_BOTTLE_TARGZ_NAME, config.WORKDIR)
+    cli_msg(f"Extracting: {config.WINE64_BOTTLE_TARGZ_NAME}\ninto: {config.APPDIR}")
     shutil.unpack_archive(os.path.join(config.WORKDIR, config.WINE64_BOTTLE_TARGZ_NAME), config.APPDIR)
-    logos_progress("Extracting…", "Extracting: " + config.WINE64_BOTTLE_TARGZ_NAME + "\ninto: " + config.APPDIR)
 
 ## END WINE BOTTLE AND WINETRICKS FUNCTIONS
 ## BEGIN LOGOS INSTALL FUNCTIONS 
@@ -319,8 +325,10 @@ def get_logos_executable():
         shutil.copy(f"{config.MYDOWNLOADS}/{config.LOGOS_EXECUTABLE}", f"{config.APPDIR}/")
 
 def installLogos9(app):
+    message = "Configuring wine bottle and installing app..."
+    cli_msg(message)
     if app is not None:
-        app.install_q.put("Configuring wine bottle and installing app...")
+        app.install_q.put(message)
         app.root.event_generate("<<UpdateInstallText>>")
 
     getPremadeWineBottle()
@@ -336,8 +344,10 @@ def installLogos9(app):
     logging.info(f"======= {config.FLPRODUCT}Bible logging set to Vista mode! =======")
 
 def installLogos10(app=None):
+    message = "Configuring wine bottle and installing app..."
+    cli_msg(message)
     if app is not None:
-        app.install_q.put("Configuring wine bottle and installing app...")
+        app.install_q.put(message)
         app.root.event_generate("<<UpdateInstallText>>")
 
     reg_file = os.path.join(config.WORKDIR, 'disable-winemenubuilder.reg')
@@ -372,8 +382,10 @@ def installLogos10(app=None):
     install_msi()
 
 def postInstall(app):
+    message = "Finishing installation..."
+    cli_msg(message)
     if app is not None:
-        app.install_q.put("Finishing installation...")
+        app.install_q.put(message)
         app.root.event_generate("<<UpdateInstallText>>")
 
     if config.DEBUG:
@@ -445,8 +457,10 @@ def prepare_install():
     chooseInstallMethod()  # We ask user for his desired install method.
 
 def finish_install(app=None):
+    message = "Beginning installation..."
+    cli_msg(message)
     if app is not None:
-        app.install_q.put("Beginning installation...")
+        app.install_q.put(message)
         app.root.event_generate("<<UpdateInstallText>>")
 
     if checkExistingInstall(app):
