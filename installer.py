@@ -154,9 +154,9 @@ def logos_setup():
     
     if config.INSTALLDIR is None:
         config.INSTALLDIR = f"{os.getenv('HOME')}/{config.FLPRODUCT}Bible{config.TARGETVERSION}"
-    if config.APPDIR is None or config.APPDIR == "":
+    if config.APPDIR is None:
         config.APPDIR = f"{config.INSTALLDIR}/data"
-    if config.APPDIR_BINDIR is None or config.APPDIR_BINDIR == "":
+    if config.APPDIR_BINDIR is None:
         config.APPDIR_BINDIR = f"{config.APPDIR}/bin"
     variables = {
         'config.FLPRODUCT': config.FLPRODUCT,
