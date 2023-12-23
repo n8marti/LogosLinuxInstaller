@@ -476,17 +476,15 @@ def finish_install(app=None):
     
     heavy_wineserver_wait()
     clean_all()
-    
+
+    # Find and set LOGOS_EXE.    
     exes = [e for e in glob.glob(f"{config.WINEPREFIX}/drive_c/**/{config.FLPRODUCT}.exe", recursive=True) if 'Pending' not in e]
     if len(exes) < 1:
         logos_error("Logos was not installed.")
     config.LOGOS_EXE = exes[0]
 
     postInstall(app)
-    
-    # with open(config.LOGOS_LOG, "a") as f:
-    #     f.write(output) # FIXME: What should be in "output"?
-    
+
     if app is not None:
         app.root.event_generate("<<CheckInstallProgress>>")
 

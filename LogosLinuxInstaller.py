@@ -223,12 +223,6 @@ def main():
         installer_app = InstallerApp(className=classname)
         InstallerWindow(installer_app, class_=classname)
         installer_app.mainloop()
-        # # Launch app after installation if successful.
-        # if config.LOGOS_EXE is not None and os.access(config.LOGOS_EXE, os.X_OK):
-        #     run_logos()
-        #     sys.exit(0)
-        # else:
-        #     logos_error("Installation was unsuccessful.")
     elif config.DIALOG == 'curses':
         choice = curses_menu(options, "Welcome to Logos on Linux", "What would you like to do?")
 

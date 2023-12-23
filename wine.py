@@ -166,8 +166,6 @@ def initializeWineBottle(app):
         app.install_q.put("Initializing wine bottle...")
         app.root.event_generate("<<UpdateInstallText>>")
 
-    #cli_continue_question(f"Now the script will create and configure the Wine Bottle at {WINEPREFIX}. You can cancel the installation of Mono. Do you wish to continue?", f"The installation was cancelled!", "")
-
     config.WINEDLLOVERRIDES = f"{config.WINEDLLOVERRIDES};mscoree=" # avoid wine-mono window
     run_wine_proc(config.WINE_EXE, exe='wineboot', exe_args=['--init'])
     config.WINEDLLOVERRIDES = ';'.join([o for o in config.WINEDLLOVERRIDES.split(';') if o != 'mscoree='])
