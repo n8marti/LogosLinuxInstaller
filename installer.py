@@ -33,7 +33,6 @@ from wine import initializeWineBottle
 from wine import install_msi
 from wine import installFonts
 from wine import installD3DCompiler
-from wine import run_logos
 from wine import wine_reg_install
 from wine import winetricks_install
 

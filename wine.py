@@ -1,10 +1,7 @@
-import fileinput
 import logging
 import os
 import psutil
 import subprocess
-import sys
-import tempfile
 import time
 
 import config
