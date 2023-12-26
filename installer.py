@@ -25,6 +25,7 @@ from utils import get_runmode
 from utils import getLogosReleases
 from utils import getWineBinOptions
 from utils import make_skel
+from utils import same_size
 from utils import write_config
 from wine import createWineBinaryList
 from wine import get_wine_env
@@ -49,12 +50,17 @@ def logos_reuse_download(SOURCEURL, FILE, TARGETDIR):
     ]
     FOUND = 1
     for i in DIRS:
-        if os.path.isfile(os.path.join(i, FILE)):
-            logging.info(f"{FILE} exists in {i}. Using it…")
-            cli_msg(f"Copying {FILE} into {TARGETDIR}")
-            shutil.copy(os.path.join(i, FILE), TARGETDIR)
-            FOUND = 0
-            break
+        file_path = os.path.join(i, FILE)
+        if os.path.isfile(file_path):
+            logging.info(f"{FILE} exists in {i}. Verifying size.")
+            if same_size(SOURCEURL, file_path):
+                logging.info(f"{FILE} is correct size. Using it…")
+                cli_msg(f"Copying {FILE} into {TARGETDIR}")
+                shutil.copy(os.path.join(i, FILE), TARGETDIR)
+                FOUND = 0
+                break
+            else:
+                logging.info(f"{FILE} is incomplete.")
     if FOUND == 1:
         message = f"{FILE} does not exist. Downloading {SOURCEURL} to {config.MYDOWNLOADS}"
         logging.info(message)
