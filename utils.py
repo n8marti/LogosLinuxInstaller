@@ -522,19 +522,14 @@ def getLogosReleases(q=None, app=None):
     cli_msg(f"Downloading release list for {config.FLPRODUCT} {config.TARGETVERSION}...")
     url = f"https://clientservices.logos.com/update/v1/feed/logos{config.TARGETVERSION}/stable.xml"
 
-    try:
-        # Fetch XML content using urllib.
-        with urllib.request.urlopen(url, timeout=30) as f:
-            response = f.read().decode('utf-8')
-    except urllib.error.URLError as e:
-        logging.critical(f"Error fetching or parsing XML: {e}")
-        if q is not None and app is not None:
-            q.put(None)
-            app.root.event_generate("<<ReleaseCheckProgress>>")
+    response_xml = net_get(url)
+    if response_xml is None and None not in [q, app]:
+        q.put(None)
+        app.root.event_generate("<<ReleaseCheckProgress>>")
         return None
 
     # Parse XML
-    root = ET.fromstring(response)
+    root = ET.fromstring(response_xml)
 
     # Define namespaces
     namespaces = {
