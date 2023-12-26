@@ -731,3 +731,11 @@ def same_size(url, file_path, app=None, evt=None):
         return res
     app.check_q.put((evt, res))
     app.root.event_generate(evt)
+
+def write_progress_bar(percent, screen_width=80):
+    y = '.'
+    n = ' '
+    l_f = int(screen_width * 0.75) # progress bar length
+    l_y = int(l_f * percent / 100) # num. of chars. complete
+    l_n  = l_f - l_y               # num. of chars. incomplete
+    print(f" [{y*l_y}{n*l_n}] {percent:>3}%", end='\r') # end='\x1b[1K\r' to erase to end of line
