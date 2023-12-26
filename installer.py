@@ -38,10 +38,6 @@ from wine import wine_reg_install
 from wine import winetricks_install
 
 
-def logos_download(uri, destination):
-    if config.DIALOG in ['curses', 'tk']:
-        cli_download(uri, destination)
-
 def logos_reuse_download(SOURCEURL, FILE, TARGETDIR):
     DIRS = [
         config.INSTALLDIR,
@@ -62,10 +58,7 @@ def logos_reuse_download(SOURCEURL, FILE, TARGETDIR):
             else:
                 logging.info(f"{FILE} is incomplete.")
     if FOUND == 1:
-        message = f"{FILE} does not exist. Downloading {SOURCEURL} to {config.MYDOWNLOADS}"
-        logging.info(message)
-        cli_msg(message)
-        logos_download(SOURCEURL, os.path.join(config.MYDOWNLOADS, FILE))
+        cli_download(SOURCEURL, os.path.join(config.MYDOWNLOADS, FILE))
         cli_msg(f"Copying: {FILE} into: {TARGETDIR}")
         shutil.copy(os.path.join(config.MYDOWNLOADS, FILE), TARGETDIR)
 
@@ -338,7 +331,7 @@ def get_logos_executable():
         shutil.copy(f"{config.MYDOWNLOADS}/{config.LOGOS_EXECUTABLE}", f"{config.APPDIR}/")
     else:
         logging.info(f"{config.LOGOS_EXECUTABLE} does not exist. Downloading…")
-        logos_download(config.LOGOS64_URL, f"{config.MYDOWNLOADS}/")
+        cli_download(config.LOGOS64_URL, f"{config.MYDOWNLOADS}/")
         shutil.move(f"{config.MYDOWNLOADS}/{config.LOGOS64_MSI}", f"{config.MYDOWNLOADS}/{config.LOGOS_EXECUTABLE}")
         shutil.copy(f"{config.MYDOWNLOADS}/{config.LOGOS_EXECUTABLE}", f"{config.APPDIR}/")
 
