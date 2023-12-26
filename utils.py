@@ -641,11 +641,13 @@ def wget(uri, target, q=None, app=None, evt=None):
                     q.put(p)
                     app.root.event_generate(evt)
 
-def same_size(url, file_path, q=None, app=None, evt=None):
+def same_size(url, file_path, app=None, evt=None):
+    logging.debug(f"Comparing {url} and {file_path}.")
     url_size = UrlProps(url).size
     file_size = FileProps(file_path).size
+    logging.debug(f"{url_size = } B; {file_size = } B")
     res = url_size == file_size
-    if None in [q, app, evt]:
+    if None in [app, evt]:
         return res
-    q.put((evt, res))
+    app.check_q.put((evt, res))
     app.root.event_generate(evt)

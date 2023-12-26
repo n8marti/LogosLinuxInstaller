@@ -116,6 +116,7 @@ class InstallerWindow(InstallerGui):
         ]
         for evt in download_events:
             self.root.bind(evt, self.update_download_progress)
+        self.check_q = Queue()
         size_events = [
             "<<CheckAppImage>>",
             "<<CheckLogos>>",
@@ -304,8 +305,6 @@ class InstallerWindow(InstallerGui):
         if checkExistingInstall():
             self.root.destroy()
             return 1
-        self.wget_q = Queue()
-        self.check_q = Queue()
         self.set_downloads()
         self.root.event_generate("<<VerifyDownloads>>")
 
@@ -338,7 +337,7 @@ class InstallerWindow(InstallerGui):
         self.progress.config(mode='indeterminate')
         self.progress.start()
         a = (url, dest)
-        k = {'q': self.check_q, 'app': self, 'evt': evt}
+        k = {'app': self, 'evt': evt}
         th = Thread(target=same_size, name=f"check-{name}", args=a, kwargs=k, daemon=True)
         th.start()
 
