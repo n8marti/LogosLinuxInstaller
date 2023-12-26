@@ -713,7 +713,7 @@ def net_get(url, target, app=None, evt=None):
                     if type(total_size) is int:
                         percent = round(local_size / total_size * 100)
                         if None not in [app, evt]:
-                            app.net_get_q.put(percent)
+                            app.get_q.put(percent)
                             app.root.event_generate(evt)
     except Exception as e:
         logging.error(e)
