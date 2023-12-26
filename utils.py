@@ -15,8 +15,6 @@ import subprocess
 import sys
 import textwrap
 import threading
-import urllib.error
-import urllib.request
 
 from base64 import b64encode
 from pathlib import Path
