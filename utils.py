@@ -7,6 +7,7 @@ import os
 import platform
 import psutil
 import re
+import requests
 import shutil
 import signal
 import subprocess
@@ -61,34 +62,44 @@ class FileProps(Props):
 class UrlProps(Props):
     def __init__(self, url=None):
         super().__init__(url)
-        self.header = None
+        self.headers = None
         if url is not None:
-            self.get_header()
+            self.get_headers()
             self.get_size()
-            # self.get_md5()
+            self.get_md5()
 
-    def get_header(self):
+    def get_headers(self):
         if self.path is None:
-            self.header = None
-        cmd = ['wget', '--no-verbose', '--spider', '--server-response', self.path]
-        p = subprocess.run(cmd, stderr=subprocess.PIPE, text=True)
-        self.header = p.stderr
-        return self.header
+            self.headers = None
+        logging.debug(f"Getting headers from {self.path}.")
+        try:
+            r = requests.head(self.path, allow_redirects=True)
+        except Exception as e:
+            logging.error(e)
+            return None
+        self.headers = r.headers
+        return self.headers
 
     def get_size(self):
-        if self.header is None:
-            self.get_header()
-        m = re.findall(r'^\s*Content-Length: ([0-9]+)$', self.header, flags=re.MULTILINE)
-        if len(m) > 0:
-            self.size = int(m[-1])
+        if self.headers is None:
+            r = self.get_headers()
+            if r is None:
+                return
+        content_length = self.headers.get('Content-Length')
+        logging.debug(f"{content_length = }")
+        if content_length is not None:
+            self.size = int(content_length)
         return self.size
 
     def get_md5(self):
-        if self.header is None:
-            self.get_header()
-        m = re.findall(r'^\s*Content-MD5: ([0-9a-zA-Z=+/_-]+)$', self.header, flags=re.MULTILINE)
-        if len(m) > 0:
-            self.md5 = m[0]
+        if self.headers is None:
+            r = self.get_headers()
+            if r is None:
+                return
+        content_md5 = self.headers.get('Content-MD5')
+        logging.debug(f"{content_md5 = }")
+        if content_md5 is not None:
+            self.md5 = content_md5
         return self.md5
 
 
