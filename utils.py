@@ -653,9 +653,8 @@ def wget(uri, target, q=None, app=None, evt=None):
                     q.put(p)
                     app.root.event_generate(evt)
 
-def net_get(url, target, app=None, evt=None):
+def net_get(url, target=None, app=None, evt=None, q=None):
     # TODO:
-    # - Allow no-target option for small files.
     # - Check available disk space before starting download
     logging.debug(f"Download source: {url}")
     logging.debug(f"Download destination: {target}")
@@ -663,7 +662,7 @@ def net_get(url, target, app=None, evt=None):
     url = UrlProps(url) # uses requests to set headers, size, md5 attribs
     if url.headers is None:
         logging.critical("Could not get headers.")
-        return
+        return None
 
     # Initialize variables.
     local_size = 0
@@ -677,7 +676,7 @@ def net_get(url, target, app=None, evt=None):
     file_mode = 'wb'
 
     # If file exists and URL is resumable, set download Range.
-    if target.path.is_file():
+    if target.path is not None and target.path.is_file():
         logging.debug(f"File exists: {str(target.path)}")
         local_size = target.get_size()
         logging.info(f"Current downloaded size in bytes: {local_size}")
@@ -689,7 +688,7 @@ def net_get(url, target, app=None, evt=None):
             else:
                 headers = {'Range': f'bytes={local_size}-'}
 
-    logging.debug(f"{file_mode = }; {headers = }")
+    logging.debug(f"{chunk_size = }; {file_mode = }; {headers = }")
 
     # Log download type.
     if headers is not None:
@@ -700,26 +699,34 @@ def net_get(url, target, app=None, evt=None):
 
     # Initiate download request.
     try:
-        with requests.get(url.path, stream=True, headers=headers) as r:
-            with target.path.open(mode=file_mode) as f:
-                if file_mode == 'wb':
-                    mode_text = 'Writing'
-                else:
-                    mode_text = 'Appending'
-                logging.debug(f"{mode_text} data to file {str(target.path)}.")
-                for chunk in r.iter_content(chunk_size=chunk_size):
-                    f.write(chunk)
-                    local_size = target.get_size()
-                    if type(total_size) is int:
-                        percent = round(local_size / total_size * 100)
-                        if None not in [app, evt]:
-                            app.get_q.put(percent)
-                            app.root.event_generate(evt)
+        if target.path is None: # return url content as text
+            with requests.get(url.path, headers=headers) as r:
+                return r.text
+        else: # download url to target.path
+            with requests.get(url.path, stream=True, headers=headers) as r:
+                with target.path.open(mode=file_mode) as f:
+                    if file_mode == 'wb':
+                        mode_text = 'Writing'
+                    else:
+                        mode_text = 'Appending'
+                    logging.debug(f"{mode_text} data to file {str(target.path)}.")
+                    for chunk in r.iter_content(chunk_size=chunk_size):
+                        f.write(chunk)
+                        local_size = target.get_size()
+                        if type(total_size) is int:
+                            percent = round(local_size / total_size * 100)
+                            if None not in [app, evt]:
+                                # Send progress value to tk window.
+                                app.get_q.put(percent)
+                                app.root.event_generate(evt)
+                            elif q is not None:
+                                # Send progress value to queue param.
+                                q.put(percent)
     except Exception as e:
-        logging.error(e)
+        logos_error(e)
     except KeyboardInterrupt:
         print()
-        logging.error("Killed with Ctrl+C")
+        logos_error("Killed with Ctrl+C")
 
 def same_size(url, file_path, app=None, evt=None):
     logging.debug(f"Comparing {url} and {file_path}.")
