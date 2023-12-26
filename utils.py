@@ -6,6 +6,7 @@ import logging
 import os
 import platform
 import psutil
+import queue
 import re
 import requests
 import shutil
@@ -13,6 +14,7 @@ import signal
 import subprocess
 import sys
 import textwrap
+import threading
 import urllib.error
 import urllib.request
 
@@ -400,9 +402,12 @@ def curses_menu(options, title, question_text):
     return choice
 
 def cli_download(uri, destination):
-    cli_msg(f"Downloading '{uri}' to '{destination}'")
+    message = f"Downloading '{uri}' to '{destination}'"
+    logging.info(message)
+    cli_msg(message)
     filename = os.path.basename(uri)
 
+    # Set target.
     if destination != destination.rstrip('/'):
         target = os.path.join(destination, os.path.basename(uri))
         if not os.path.isdir(destination):
@@ -415,7 +420,21 @@ def cli_download(uri, destination):
         if not os.path.isdir(dirname):
             os.makedirs(dirname)
 
-    subprocess.call(['wget', '-c', uri, '-O', target])
+    # Download from uri in thread while showing progress bar.
+    cli_queue = queue.Queue()
+    args = [uri, target]
+    kwargs = kwargs={'q': cli_queue}
+    t = threading.Thread(target=net_get, args=args, kwargs=kwargs, daemon=True)
+    t.start()
+    try:
+        while t.is_alive():
+            if cli_queue.empty():
+                continue
+            write_progress_bar(cli_queue.get())
+        print()
+    except KeyboardInterrupt:
+        print()
+        logos_error('Interrupted with Ctrl+C')
 
 def set_appimage():
     os.symlink(config.WINE64_APPIMAGE_FILENAME, f"{config.APPDIR_BINDIR}/{config.APPIMAGE_LINK_SELECTION_NAME}")
