@@ -36,10 +36,11 @@ class Props():
 class FileProps(Props):
     def __init__(self, f=None):
         super().__init__(f)
-        self.path = Path(self.path)
         if f is not None:
-            self.get_size()
-            # self.get_md5()
+            self.path = Path(self.path)
+            if self.path.is_file():
+                self.get_size()
+                # self.get_md5()
 
     def get_size(self):
         if self.path is None:
