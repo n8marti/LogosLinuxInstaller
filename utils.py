@@ -653,6 +653,74 @@ def wget(uri, target, q=None, app=None, evt=None):
                     q.put(p)
                     app.root.event_generate(evt)
 
+def net_get(url, target, app=None, evt=None):
+    # TODO:
+    # - Allow no-target option for small files.
+    # - Check available disk space before starting download
+    logging.debug(f"Download source: {url}")
+    logging.debug(f"Download destination: {target}")
+    target = FileProps(target) # sets path and size attribs
+    url = UrlProps(url) # uses requests to set headers, size, md5 attribs
+    if url.headers is None:
+        logging.critical("Could not get headers.")
+        return
+
+    # Initialize variables.
+    local_size = 0
+    total_size = url.size # None or int
+    logging.debug(f"File size on server: {total_size}")
+    percent = None
+    chunk_size = 100*1024 # 100 KB default
+    if type(total_size) is int:
+        chunk_size = min([int(total_size/50), 2*1024*1024]) # smaller of 2% of filesize or 2 MB
+    headers = None
+    file_mode = 'wb'
+
+    # If file exists and URL is resumable, set download Range.
+    if target.path.is_file():
+        logging.debug(f"File exists: {str(target.path)}")
+        local_size = target.get_size()
+        logging.info(f"Current downloaded size in bytes: {local_size}")
+        if url.headers.get('Accept-Ranges') == 'bytes':
+            logging.debug(f"Server accepts byte range; attempting to resume download.")
+            file_mode = 'ab'
+            if type(url.size) is int:
+                headers = {'Range': f'bytes={local_size}-{total_size}'}
+            else:
+                headers = {'Range': f'bytes={local_size}-'}
+
+    logging.debug(f"{file_mode = }; {headers = }")
+
+    # Log download type.
+    if headers is not None:
+        message = f"Continuing download."
+    else:
+        message = f"Starting new download."
+    logging.info(message)
+
+    # Initiate download request.
+    try:
+        with requests.get(url.path, stream=True, headers=headers) as r:
+            with target.path.open(mode=file_mode) as f:
+                if file_mode == 'wb':
+                    mode_text = 'Writing'
+                else:
+                    mode_text = 'Appending'
+                logging.debug(f"{mode_text} data to file {str(target.path)}.")
+                for chunk in r.iter_content(chunk_size=chunk_size):
+                    f.write(chunk)
+                    local_size = target.get_size()
+                    if type(total_size) is int:
+                        percent = round(local_size / total_size * 100)
+                        if None not in [app, evt]:
+                            app.net_get_q.put(percent)
+                            app.root.event_generate(evt)
+    except Exception as e:
+        logging.error(e)
+    except KeyboardInterrupt:
+        print()
+        logging.error("Killed with Ctrl+C")
+
 def same_size(url, file_path, app=None, evt=None):
     logging.debug(f"Comparing {url} and {file_path}.")
     url_size = UrlProps(url).size
