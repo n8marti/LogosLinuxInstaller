@@ -8,6 +8,9 @@ import argparse
 import config
 from app import InstallerApp
 from app import InstallerWindow
+from control import open_config_file
+from control import remove_all_index_files
+from control import remove_library_catalog
 from installer import install
 from msg import cli_msg
 from msg import initialize_logging
@@ -116,7 +119,7 @@ def parse_command_line():
         config.ACTION = 'control'
 
 def edit_config():
-    pass
+    open_config_file()
 
 def backup():
     pass
