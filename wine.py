@@ -227,10 +227,6 @@ def run_wine_proc(winecmd, exe=None, exe_args=list()):
     except subprocess.CalledProcessError as e:
         logging.error(f"Error 2 running {winecmd} {exe}: {e}")
 
-def run_control_panel():
-    run_wine_proc(config.WINE_EXE, exe="control")
-    run_wine_proc(config.WINESERVER_EXE, exe_args=["-w"])
-
 def run_winetricks():
     run_wine_proc(config.WINETRICKSBIN)
     run_wine_proc(config.WINESERVER_EXE, exe_args=["-w"])
