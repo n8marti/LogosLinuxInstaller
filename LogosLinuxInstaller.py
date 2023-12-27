@@ -110,6 +110,8 @@ def parse_command_line():
         config.ACTION = 'indexing'
     if args.passive:
         config.PASSIVE = True
+    if args.logs:
+        config.ACTION = 'logging'
     if args.control_panel:
         config.ACTION = 'control'
 
@@ -141,7 +143,9 @@ def main():
         if config.ACTION == 'indexing':
             run_indexing()
             sys.exit(0)
-
+        elif config.ACTION == 'logging':
+            switch_logging()
+            sys.exit(0)
         elif config.ACTION == 'app':
             run_logos()
             sys.exit(0)
@@ -214,11 +218,7 @@ def main():
     elif choice == "Run Winetricks":
         run_winetricks()
     elif choice.endswith("Logging"):
-        if config.LOGS == "DISABLED":
-            action = 'disable'
-        else:
-            action = 'enable'
-        switch_logging(action=action)
+        switch_logging()
     else:
         logos_error("Unknown menu choice.")
 
