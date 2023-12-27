@@ -6,7 +6,8 @@ import sys
 import argparse
 
 import config
-from app import InstallerApp
+from app import ControlWindow
+from app import App
 from app import InstallerWindow
 from control import open_config_file
 from control import remove_all_index_files
@@ -118,6 +119,12 @@ def parse_command_line():
     if args.control_panel:
         config.ACTION = 'control'
 
+def run_control_panel():
+    classname = "LogosLinuxControlPanel"
+    app = App(className=classname)
+    win = ControlWindow(app, class_=classname)
+    app.mainloop()
+
 def edit_config():
     open_config_file()
 
@@ -143,7 +150,10 @@ def main():
 
     # If Logos app is installed, run the desired Logos action.
     if config.LOGOS_EXE is not None and os.access(config.LOGOS_EXE, os.X_OK):
-        if config.ACTION == 'indexing':
+        if config.ACTION == 'control':
+            run_control_panel()
+            sys.exit(0)
+        elif config.ACTION == 'indexing':
             run_indexing()
             sys.exit(0)
         elif config.ACTION == 'logging':
@@ -188,7 +198,7 @@ def main():
     choice = None
     if config.DIALOG is None or config.DIALOG == 'tk':
         classname = "LogosLinuxInstaller"
-        installer_app = InstallerApp(className=classname)
+        installer_app = App(className=classname)
         InstallerWindow(installer_app, class_=classname)
         installer_app.mainloop()
     elif config.DIALOG == 'curses':
