@@ -148,6 +148,11 @@ def main():
 
     parse_command_line()
 
+    # Configure logging.
+    if config.DELETE_INSTALL_LOG and os.path.isfile(config.LOGOS_LOG):
+        os.remove(config.LOGOS_LOG)
+    initialize_logging(config.LOG_LEVEL)
+
     # If Logos app is installed, run the desired Logos action.
     if config.LOGOS_EXE is not None and os.access(config.LOGOS_EXE, os.X_OK):
         if config.ACTION == 'control':
@@ -170,18 +175,13 @@ def main():
         config.DIALOG = config.DIALOG.lower()
         if config.DIALOG == 'tk':
             config.GUI = True
-        
-    if config.GUI is True:
-        setDebug()
 
     cli_msg(f"{config.LOGOS_SCRIPT_TITLE}, {config.LOGOS_SCRIPT_VERSION} by {config.LOGOS_SCRIPT_AUTHOR}.")
-
-    # Configure logging.
-    if config.DELETE_INSTALL_LOG and os.path.isfile(config.LOGOS_LOG):
-        os.remove(config.LOGOS_LOG)
-    initialize_logging(config.LOG_LEVEL)
     logging.info("Starting installation.") 
     logging.info(f"Using DIALOG: {config.DIALOG}")
+
+    if config.GUI is True:
+        setDebug()
 
     options_default = ["Install Logos Bible Software"]
     options_exit = ["Exit"]
