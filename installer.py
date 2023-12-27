@@ -25,7 +25,7 @@ from utils import get_runmode
 from utils import getLogosReleases
 from utils import getWineBinOptions
 from utils import make_skel
-from utils import same_size
+from utils import verify_downloaded_file
 from utils import write_config
 from wine import createWineBinaryList
 from wine import get_wine_env
@@ -48,9 +48,9 @@ def logos_reuse_download(SOURCEURL, FILE, TARGETDIR):
     for i in DIRS:
         file_path = os.path.join(i, FILE)
         if os.path.isfile(file_path):
-            logging.info(f"{FILE} exists in {i}. Verifying size.")
-            if same_size(SOURCEURL, file_path):
-                logging.info(f"{FILE} is correct size. Using it…")
+            logging.info(f"{FILE} exists in {i}. Verifying properties.")
+            if verify_downloaded_file(SOURCEURL, file_path):
+                logging.info(f"{FILE} properties match. Using it…")
                 cli_msg(f"Copying {FILE} into {TARGETDIR}")
                 shutil.copy(os.path.join(i, FILE), TARGETDIR)
                 FOUND = 0

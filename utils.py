@@ -753,8 +753,32 @@ def net_get(url, target=None, app=None, evt=None, q=None):
         print()
         logos_error("Killed with Ctrl+C")
 
+def verify_downloaded_file(url, file_path, app=None, evt=None):
+    res = False
+    msg = f"{file_path} is the wrong size."
+    right_size = same_size(url, file_path, app=app, evt=evt)
+    if right_size:
+        msg = f"{file_path} has the wrong MD5 sum."
+        right_md5 = same_md5(url, file_path, app=app, evt=evt)
+        if right_md5:
+            msg = f"{file_path} is verified."
+            res = True
+    logging.debug(msg)
+    return res
+
+def same_md5(url, file_path, app=None, evt=None):
+    logging.debug(f"Comparing MD5 of {url} and {file_path}.")
+    url_md5 = UrlProps(url).get_md5()
+    file_md5 = FileProps(file_path).get_md5()
+    logging.debug(f"{url_md5 = }; {file_md5 = }")
+    res = url_md5 == file_md5
+    if None in [app, evt]:
+        return res
+    app.check_q.put((evt, res))
+    app.root.event_generate(evt)
+
 def same_size(url, file_path, app=None, evt=None):
-    logging.debug(f"Comparing {url} and {file_path}.")
+    logging.debug(f"Comparing size of {url} and {file_path}.")
     url_size = UrlProps(url).size
     file_size = FileProps(file_path).size
     logging.debug(f"{url_size = } B; {file_size = } B")
