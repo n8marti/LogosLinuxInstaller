@@ -57,6 +57,7 @@ class FileProps(Props):
             for chunk in iter(lambda: f.read(4096), b''):
                 md5.update(chunk)
         self.md5 = b64encode(md5.digest()).decode('utf-8')
+        logging.debug(f"{str(self.path)} MD5: {self.md5}")
         return self.md5
 
 class UrlProps(Props):
@@ -96,7 +97,16 @@ class UrlProps(Props):
             r = self.get_headers()
             if r is None:
                 return
-        content_md5 = self.headers.get('Content-MD5')
+        if self.headers.get('server') == 'AmazonS3':
+            content_md5 = self.headers.get('etag')
+            if content_md5 is not None:
+                # Convert from hex to base64
+                content_md5_hex = content_md5.strip('"').strip("'")
+                content_md5 = b64encode(bytes.fromhex(content_md5_hex)).decode()
+        else:
+            content_md5 = self.headers.get('Content-MD5')
+        if content_md5 is not None:
+            content_md5 = content_md5.strip('"').strip("'")
         logging.debug(f"{content_md5 = }")
         if content_md5 is not None:
             self.md5 = content_md5
