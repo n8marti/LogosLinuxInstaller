@@ -78,6 +78,9 @@ class UrlProps(Props):
         except Exception as e:
             logging.error(e)
             return None
+        except KeyboardInterrupt:
+            print()
+            logos_error("Interrupted by Ctrl+C")
         self.headers = r.headers
         return self.headers
 
