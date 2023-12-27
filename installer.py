@@ -315,25 +315,13 @@ def get_logos_executable():
     PRESENT_WORKING_DIRECTORY = config.PRESENT_WORKING_DIRECTORY
     HOME = os.environ.get('HOME')
     # This VAR is used to verify the downloaded MSI is latest
-    if config.LOGOS_EXECUTABLE is None:
-        config.LOGOS_EXECUTABLE = f"{config.FLPRODUCT}_v{config.LOGOS_VERSION}-x64.msi"
+    config.LOGOS_EXECUTABLE = f"{config.FLPRODUCT}_v{config.LOGOS_VERSION}-x64.msi"
     
     #cli_continue_question(f"Now the script will check for the MSI installer. Then it will download and install {FLPRODUCT} Bible at {WINEPREFIX}. You will need to interact with the installer. Do you wish to continue?", "The installation was cancelled!", "")
     
     # Getting and installing {FLPRODUCT} Bible
-    # First check current directory to see if the .MSI is present; if not, check user's Downloads/; if not, download it new. Once found, copy it to WORKDIR for future use.
     logging.info(f"Installing {config.FLPRODUCT}Bible 64bits…")
-    if os.path.isfile(f"{PRESENT_WORKING_DIRECTORY}/{config.LOGOS_EXECUTABLE}"):
-        logging.info(f"{config.LOGOS_EXECUTABLE} exists. Using it…")
-        shutil.copy(f"{PRESENT_WORKING_DIRECTORY}/{config.LOGOS_EXECUTABLE}", f"{config.APPDIR}/")
-    elif os.path.isfile(f"{config.MYDOWNLOADS}/{config.LOGOS_EXECUTABLE}"):
-        logging.info(f"{config.LOGOS_EXECUTABLE} exists. Using it…")
-        shutil.copy(f"{config.MYDOWNLOADS}/{config.LOGOS_EXECUTABLE}", f"{config.APPDIR}/")
-    else:
-        logging.info(f"{config.LOGOS_EXECUTABLE} does not exist. Downloading…")
-        cli_download(config.LOGOS64_URL, f"{config.MYDOWNLOADS}/")
-        shutil.move(f"{config.MYDOWNLOADS}/{config.LOGOS64_MSI}", f"{config.MYDOWNLOADS}/{config.LOGOS_EXECUTABLE}")
-        shutil.copy(f"{config.MYDOWNLOADS}/{config.LOGOS_EXECUTABLE}", f"{config.APPDIR}/")
+    logos_reuse_download(config.LOGOS64_URL, config.LOGOS_EXECUTABLE, f"{config.APPDIR}/")
 
 def installLogos9(app):
     message = "Configuring wine bottle and installing app..."
