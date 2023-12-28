@@ -56,11 +56,15 @@ def logos_reuse_download(SOURCEURL, FILE, TARGETDIR):
                 FOUND = 0
                 break
             else:
-                logging.info(f"{FILE} is incomplete.")
+                logging.info(f"Incomplete file: {file_path}.")
     if FOUND == 1:
-        cli_download(SOURCEURL, os.path.join(config.MYDOWNLOADS, FILE))
-        cli_msg(f"Copying: {FILE} into: {TARGETDIR}")
-        shutil.copy(os.path.join(config.MYDOWNLOADS, FILE), TARGETDIR)
+        file_path = os.path.join(config.MYDOWNLOADS, FILE)
+        cli_download(SOURCEURL, file_path)
+        if verify_downloaded_file(SOURCEURL, file_path):
+            cli_msg(f"Copying: {FILE} into: {TARGETDIR}")
+            shutil.copy(os.path.join(config.MYDOWNLOADS, FILE), TARGETDIR)
+        else:
+            logos_error(f"Bad file size or checksum: {file_path}")
 
 def getAppImage():
     wine64_appimage_full_filename = Path(config.WINE64_APPIMAGE_FULL_FILENAME)
@@ -434,7 +438,6 @@ def postInstall(app):
         runmode = get_runmode()
         if runmode == 'binary':
             launcher_exe = Path(f"{config.INSTALLDIR}/LogosLinuxLauncher")
-            # FIXME: Confirm file copy and test desktop launcher.
             if launcher_exe.is_file():
                 logging.debug(f"Removing existing launcher binary.")
                 launcher_exe.unlink()

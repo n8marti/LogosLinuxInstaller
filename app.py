@@ -26,7 +26,7 @@ from installer import finish_install
 from installer import logos_setup
 from msg import cli_msg
 from utils import checkDependencies
-from utils import same_size
+from utils import verify_downloaded_file
 from utils import getLogosReleases
 from utils import getWineBinOptions
 from utils import net_get
@@ -84,10 +84,10 @@ class InstallerWindow(InstallerGui):
         self.custombinpath = config.CUSTOMBINPATH
 
         # Set other variables to be used later.
-        self.appimage_same_size = None
-        self.logos_same_size = None
-        self.icon_same_size = None
-        self.tricks_same_size = None
+        self.appimage_verified = None
+        self.logos_verified = None
+        self.icon_verified = None
+        self.tricks_verified = None
         self.set_product()
 
         # Set widget callbacks and event bindings.
@@ -118,13 +118,13 @@ class InstallerWindow(InstallerGui):
         for evt in download_events:
             self.root.bind(evt, self.update_download_progress)
         self.check_q = Queue()
-        size_events = [
+        check_events = [
             "<<CheckAppImage>>",
             "<<CheckLogos>>",
             "<<CheckIcon>>",
         ]
-        for evt in size_events:
-            self.root.bind(evt, self.update_file_size_check_progress)
+        for evt in check_events:
+            self.root.bind(evt, self.update_file_check_progress)
         self.root.bind("<<CheckInstallProgress>>", self.update_install_progress)
         self.root.bind("<<VerifyDownloads>>", self.start_verify_downloads_thread)
         self.root.bind("<<StartInstall>>", self.start_install_thread)
@@ -254,13 +254,13 @@ class InstallerWindow(InstallerGui):
         icon_download = Path(dl_dir / config.LOGOS_ICON_FILENAME)
         self.downloads = [
             ['appimage', config.WINE64_APPIMAGE_FULL_URL, appimage_download,
-                self.appimage_same_size, '<<GetAppImage>>', '<<CheckAppImage>>',
+                self.appimage_verified, '<<GetAppImage>>', '<<CheckAppImage>>',
             ],
             ['logos', config.LOGOS64_URL, logos_download,
-                self.logos_same_size, '<<GetLogos>>', '<<CheckLogos>>',
+                self.logos_verified, '<<GetLogos>>', '<<CheckLogos>>',
             ],
             ['icon', config.LOGOS_ICON_URL, icon_download,
-                self.icon_same_size, '<<GetIcon>>', '<<CheckIcon>>',
+                self.icon_verified, '<<GetIcon>>', '<<CheckIcon>>',
             ]
         ]
         if self.winetricksbin.startswith('Download'):
@@ -268,7 +268,7 @@ class InstallerWindow(InstallerGui):
             tricks_download = config.WINETRICKSBIN
             self.downloads.append(
                 'winetricks', tricks_url, tricks_download,
-                    self.tricks_same_size, '<<GetWinetricks>>', '<<CheckWinetricks>>'
+                    self.tricks_verified, '<<GetWinetricks>>', '<<CheckWinetricks>>'
             )
         self.downloads_orig = self.downloads.copy()
 
@@ -329,7 +329,7 @@ class InstallerWindow(InstallerGui):
         th.start()
 
     def start_check_thread(self, name, url, dest, evt):
-        m = f"Checking size of {dest}"
+        m = f"Verifying file {dest}..."
         cli_msg(m)
         logging.info(m)
         self.statusvar.set(m)
@@ -338,7 +338,7 @@ class InstallerWindow(InstallerGui):
         self.progress.start()
         a = (url, dest)
         k = {'app': self, 'evt': evt}
-        th = Thread(target=same_size, name=f"check-{name}", args=a, kwargs=k, daemon=True)
+        th = Thread(target=verify_downloaded_file, name=f"check-{name}", args=a, kwargs=k, daemon=True)
         th.start()
 
     def start_install_thread(self, evt=None):
@@ -376,11 +376,11 @@ class InstallerWindow(InstallerGui):
                 continue
             elif dest.is_file() and test is False and dl_thread is None: # file check failed; restart download
                 if name == 'appimage':
-                    self.appimage_same_size = None
+                    self.appimage_verified = None
                 elif name == 'logos':
-                    self.logos_same_size = None
+                    self.logos_verified = None
                 elif name == 'icon':
-                    self.icon_same_size = None
+                    self.icon_verified = None
                 logging.info("Starting download thread.")
                 self.start_download_thread(name, url, dest, dl_evt)
                 continue
@@ -413,16 +413,16 @@ class InstallerWindow(InstallerGui):
             self.statusvar.set("Failed to get release list. Check connection and try again.")
 
 
-    def update_file_size_check_progress(self, evt=None):
+    def update_file_check_progress(self, evt=None):
         e, r = self.check_q.get()
         if e == "<<CheckAppImage>>":
-            self.appimage_same_size = r
+            self.appimage_verified = r
         elif e == "<<CheckLogos>>":
-            self.logos_same_size = r
+            self.logos_verified = r
         elif e == "<<CheckIcon>>":
-            self.icon_same_size = r
+            self.icon_verified = r
         elif e == "<<CheckWinetricks>>":
-            self.tricks_same_size = r
+            self.tricks_verified = r
         self.downloads[0][3] = r # "current" download should always be 1st item in self.downloads
         self.progress.stop()
         self.statusvar.set('')
